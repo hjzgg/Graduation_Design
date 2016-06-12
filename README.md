@@ -44,7 +44,11 @@
 
 注：
     请按照上面的最终目录结构配置目录的名称，如果目录的名称不一样，那么请手动修改项目根目录下start.bat和stop.bat内容中的目录名称。
+    
     系统前端代码下载: https://github.com/hjzgg/DsDemo （这就是最终通过exe4j打包成DsDemo目录下的.exe的项目）
+    
     系统后台代码下载：https://github.com/hjzgg/dsDemoWeb （就是dsdemo.war的源码,是一个maven工程，采用springmvc框架）
+    
     补充：exe4j的使用请参考， http://www.jb51.net/article/44392.htm
+    
     如果问题请qq联系: 2570230521
