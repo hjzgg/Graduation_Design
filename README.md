@@ -42,5 +42,7 @@
 
 7.执行项目根目录下的start.bat文件，运行项目，会自动开启tomcat，注册mysql服务并启动mysql服务，启动redis服务以及DsDemo目录下的.exe程序。
 
-注：系统前端代码下载: https://github.com/hjzgg/DsDemo （这就是最终通过exe4j打包成DsDemo目录下的.exe的项目）
+注：
+    系统前端代码下载: https://github.com/hjzgg/DsDemo （这就是最终通过exe4j打包成DsDemo目录下的.exe的项目）
     系统后台代码下载：https://github.com/hjzgg/dsDemoWeb （就是dsdemo.war的源码）
+    如果问题请qq联系: 2570230521
