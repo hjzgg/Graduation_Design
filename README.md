@@ -7,7 +7,7 @@
 
 2.其中images文件夹不属于项目，只是用来存放README.md文件中要显示的图片的。
 
-3.分别将7.0版本以上的tomcat，mysql，最新java JDK(本人使用的是jdk1.8.0_92),以及redis(下载链接:https://github.com/hjzgg/redis)放入到项目的根目录。
+3.分别将7.0版本以上的tomcat，mysql，最新java JDK(本人使用的是jdk1.8.0_92),以及redis(下载链接: https://github.com/hjzgg/redis ) 放入到项目的根目录。
 
 4.其中mysql_bat目录下的两个bat文件放入mysql的根目录下，redis_bat目录下的两个bat文件放入到redis的根目录下，随后删除这两个文件夹就好了。
 
