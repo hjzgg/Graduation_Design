@@ -1,0 +1,43 @@
+class BTree{
+	public String x;
+	public BTree lchild;
+	public BTree rchild;
+	
+	public BTree(String x){
+		this.x = x;
+		lchild = null;
+		rchild = null;
+	}
+}
+
+public class Main {
+	private static int ti = 0;
+	private static String[] ts = null;
+	
+	private static BTree buildT(){
+		if(ti >= ts.length || ts[ti].equals("?")) {
+			ti++;
+			return null;
+		}
+		BTree T = new BTree(ts[ti++]);
+		T.lchild = buildT();
+		T.rchild = buildT();
+		return T;
+	}
+	
+	private static void postData(BTree T){
+		if(T == null) return;
+		postData(T.lchild);
+		postData(T.rchild);
+		System.out.print(T.x + " ");
+	}
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String content = scan.nextLine();
+		 ts = content.split(" ");
+		 BTree T = null;
+		 T = buildT();
+		 postData(T);
+	}
+}

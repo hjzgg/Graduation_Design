@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 将空格换成全角的空格，就可以保证html不会将空格过滤掉 -->
+<xml-body>
+    <html>   
+		<head>
+			<style>
+				.msg'{
+					font-size:20px;
+					font-weight:10px;
+				'}
+				.mydiv'{
+					background-color:#f5f5f5;
+				'}
+				 
+				.title'{
+					font-family:Helvetica,sans-serif;
+					font-weight: bold;
+					color:#317eac;
+					font-size:24.5px;
+					text-rendering:optimizelegibility;
+				'}
+				.htitle'{
+					font-size:31.5px;
+					font-family:Helvetica,sans-serif;
+					font-weight: bold;
+					color:#317eac;
+					text-rendering:optimizelegibility;
+				'}
+			</style>
+		</head>
+		<body style="width: 100%">
+			<center><span class="htitle">{0}</span></center>
+			<center>
+				<div class="msg">
+					Time Limit: <span style="color: red;">1000ms </span> &#160;&#160;&#160;
+					Memory Limit: <span style="color: red;">65536KB</span> &#160;&#160;&#160;
+					Java class name: <span style="color: red;">Main</span>
+				</div>
+			</center>
+			<!-- 题目描述 -->
+			<br/>
+			<div class="title">
+				Describ
+			</div>
+			<div class="mydiv">
+				&#160;&#160;&#160;&#160;&#160;&#160;&#160;{1}
+			</div>
+			
+			<!-- 输入 -->
+			<br/>
+			<div class="title">
+				Input
+			</div>
+			<div class="mydiv">
+				&#160;&#160;&#160;&#160;&#160;&#160;&#160;{2}
+			</div>
+			
+			<!-- 输入 -->
+			<br/>
+			<div class="title">
+				Output
+			</div>
+			<div class="mydiv">
+				&#160;&#160;&#160;&#160;&#160;&#160;&#160;{3}
+			</div>
+			
+			<!-- 样例输入 -->
+			<br/>
+			<div class="title">
+				Sample Iutput
+			</div>
+			<div class="mydiv" >
+				<div style="margin-left:20px;">
+					<pre>{4}</pre>
+				</div>
+			</div>
+			
+			<!-- 样例输出 -->
+			<br/>
+			<div class="title">
+				Sample Output
+			</div>
+			<div class="mydiv">
+				<div style="margin-left:20px;">
+					<pre>{5}</pre>
+				</div>
+			</div>
+	
+			<!-- 提示 -->
+			<br/>
+			<div class="title">
+				Tags 
+			</div>
+			<div class="mydiv">
+				&#160;&#160;&#160;&#160;&#160;&#160;&#160;{6}
+			</div>
+		</body>
+	</html>
+</xml-body>
+    

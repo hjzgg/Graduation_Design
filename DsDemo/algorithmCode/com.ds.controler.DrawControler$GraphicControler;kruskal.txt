@@ -1,0 +1,129 @@
+class Node{
+	public String x;
+	public List<Edge> edges = new ArrayList<Edge>();
+	public Node(String x){
+		this.x = x;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((edges == null) ? 0 : edges.hashCode());
+		result = prime * result + ((x == null) ? 0 : x.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (x == null) {
+			if (other.x != null)
+				return false;
+		} else if (!x.equals(other.x))
+			return false;
+		return true;
+	}
+	
+}
+
+class Edge{
+	public Node to;
+	public Node from;
+	public int dist;
+	public Edge(Node from, Node to, int dist) {
+		super();
+		this.to = to;
+		this.from = from;
+		this.dist = dist;
+	}
+	
+	@Override
+	public String toString(){
+		return from.x + " " + to.x + " " + dist;
+	}
+}
+
+
+public class Main {
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String data = scan.nextLine();
+		 String[] edges = data.split(";");
+		 //默认有权值, 无向图
+		 List<Node> nodes = buildG(edges);
+		 kruskal(nodes);
+	}
+	
+	private static Map<Node, Node> f = new HashMap<Node, Node>();
+	
+	private static Node find(Node x){
+		if(x.equals(f.get(x))) return x;
+		else {
+			Node ff = find(f.get(x));
+			f.put(x, ff);
+			return ff;
+		}
+	}
+	
+	private static boolean union(Node x, Node y){
+		Node fx = find(x);
+		Node fy = find(y);
+		if(!fx.equals(fy)) {
+			f.put(fx, fy);
+			return true;
+		}
+		return false;
+	}
+	
+	private static void kruskal(List<Node> nodes) {
+		List<Edge> edges = new ArrayList<Edge>();
+		for(Node node : nodes){
+			edges.addAll(node.edges);
+			f.put(node, node);
+		}
+		Collections.sort(edges, new Comparator<Edge>() {
+			@Override
+			public int compare(Edge o1, Edge o2) {
+				return o1.dist - o2.dist;
+			}
+		});
+		
+		List<Edge> select = new ArrayList<Edge>();
+		for(Edge edge : edges){
+			if(union(edge.from, edge.to))
+				select.add(edge);
+		}
+		
+		for(Edge edge : select){
+			System.out.println(edge.from.x + "---" + edge.to.x + " " + edge.dist);
+		}
+	}
+	 
+
+	private static List<Node> buildG(String[] edges) {
+		Map<String, Node> map = new HashMap<String, Node>();
+		for(String edge : edges){
+			 String[] msgs = edge.split(" ");
+			 if(map.get(msgs[0]) == null)
+				 map.put(msgs[0], new Node(msgs[0]));
+			 if(map.get(msgs[1]) == null) 
+				 map.put(msgs[1], new Node(msgs[1]));
+			 Node from = map.get(msgs[0]);
+			 Node to = map.get(msgs[1]);
+			 Edge fromTo = new Edge(from, to, Integer.valueOf(msgs[2]));
+			 Edge toFrom = new Edge(to, from, Integer.valueOf(msgs[2]));
+			 from.edges.add(fromTo);
+			 to.edges.add(toFrom);
+		}
+		List<Node> nodes = new ArrayList<Node>();
+		for(String key : map.keySet())
+			nodes.add(map.get(key));
+		return nodes;
+	}
+}

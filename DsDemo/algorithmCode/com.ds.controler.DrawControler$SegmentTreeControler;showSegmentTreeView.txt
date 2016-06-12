@@ -1,0 +1,38 @@
+public class SegmentTreeModel{
+	private SegmentTreeNode root = null;
+	private int treeLevel = 0;
+	private boolean maxOrMin;
+	private SegmentTreeNode buildSegmentTree(String[] datas, int ld, int rd, int level){
+		if(ld > rd) return null;
+		if(ld == rd){
+			if(treeLevel < level) treeLevel = level;
+			SegmentTreeNode node = new SegmentTreeNode(datas[ld], ld, rd);
+			return node;
+		} else {
+			int mid = (ld+rd)>>1;
+		    SegmentTreeNode node = new SegmentTreeNode(null, ld, rd);
+		    node.lchild = buildSegmentTree(datas, ld, mid, level+1);
+		    node.rchild = buildSegmentTree(datas, mid+1, rd, level+1);
+		    int x;
+		    if(maxOrMin)
+		    	x = Math.max(Integer.valueOf(node.lchild.content), Integer.valueOf(node.rchild.content));
+		    else 
+		    	x = Math.min(Integer.valueOf(node.lchild.content), Integer.valueOf(node.rchild.content));
+		    node.content = String.valueOf(x);
+		    return node;
+		}
+	}
+	
+	public void createSegmentTreeData(String data){
+		String[] datas = data.split(" ");
+		root = buildSegmentTree(datas, 0, datas.length-1, 1);
+	}
+	
+	/**
+	 * @param maxOrMin	区间最大值或者区间最小值
+	 */
+	public SegmentTreeModel(Boolean maxOrMin) {
+		super();
+		this.maxOrMin = maxOrMin;
+	}
+}

@@ -1,0 +1,193 @@
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+#include<cstdio> 
+using namespace std;
+const int INF=0X3f3f3f3f;
+typedef struct
+{
+   int a[100];
+   int len;
+   void outList(){
+        for(int i=1; i<=len; ++i){
+            cout<<a[i]<<" ";
+        }
+        cout<<endl;
+   }
+}list;
+list L;
+
+/*********************************************************************/ 
+void direct_insertion_sort()//直接插入排序 
+{
+   int i, j;
+   for(i=2; i<=L.len; i++)
+     {
+         L.a[0]=L.a[i];
+         for(j=i-1; L.a[0]<L.a[j]; j--)
+           L.a[j+1]=L.a[j];
+         L.a[j+1]=L.a[0];
+     }
+}
+
+/*********************************************************************/ 
+
+void benary_insertion_sort1()//折半插入排序 
+{
+   int i, j, left, right, mid;
+   for(i=2; i<=L.len; i++)
+     {
+        left=1;
+        right=i-1;
+        L.a[0]=L.a[i];
+        while(left<=right)
+         {
+               mid=(left+right)/2;
+               if(L.a[mid]<=L.a[0])
+                  left=mid+1;
+               else
+                  right=mid-1;
+         }
+        for(j=i-1; j>=left; j--)
+          L.a[j+1]=L.a[j];
+        L.a[j+1]=L.a[0];
+     }
+} 
+
+/*********************************************************************/ 
+
+void benary_insertion_sort2(){//折半插入排序 
+    for(int i=2; i<=L.len; ++i){
+        L.a[0] = L.a[i];
+        int k = upper_bound(L.a+1, L.a+i, L.a[0]) - L.a;//返回最后一个大于key的位置 
+        for(int j=i; j>k; --j)
+            L.a[j] = L.a[j-1];
+        L.a[k] = L.a[0];
+    }
+}
+
+/*********************************************************************/ 
+void twoWay_insertion_sort()//二路插入排序 
+{
+   int *d=(int *)malloc(sizeof(int)*L.len);
+   int first, final, i, j;
+   first=final=0;
+   d[0]=L.a[1];
+   for(i=2; i<=L.len; i++)
+     {
+         if(L.a[i]>=d[final])//直接添加在尾部 
+           d[++final]=L.a[i];
+         else if(L.a[i]<=d[first])//直接添加在头部 
+           d[first=(first-1+L.len)%L.len]=L.a[i];
+         else//在头部和尾部中间
+          {
+               for(j=final++; d[j]>=L.a[i]; j=(j-1+L.len)%L.len)
+                 d[(j+1)%L.len]=d[j];
+               d[(j+1)%L.len]=L.a[i];
+          }
+     }
+    for(i=first, j=1; i!=final; i=(i+1)%L.len, j++)
+      L.a[j]=d[i];
+ 　　L.a[j] = d[i];
+}
+
+/*********************************************************************/ 
+void shell_insertion_sort(int d)
+{
+   int i, j;
+   for(i=d+1; i<=L.len; i++)
+     {
+         if(L.a[i]<L.a[i-d])//需要将L.a[i]插入有序增量字表 
+           {
+                 L.a[0]=L.a[i];
+               for(j=i-d; j>=1 && L.a[0]<=L.a[j]; j-=d)
+                  L.a[j+d]=L.a[j];
+               L.a[j+d]=L.a[0];
+           }
+     }
+}
+
+void shellsort()//希尔排序 
+{
+    int dk[]={5, 3, 1};//设置子序列的增量 
+    for(int i=0; i<3; i++)
+      shell_insertion_sort(dk[i]);
+}
+
+/*********************************************************************/ 
+
+typedef struct xxx{
+    int head;//头结点 
+    int a[100];
+    int next[100];//记录下一个元素的位置 
+    int len;
+    xxx(){
+        head = 1;
+        memset(next, 0, sizeof(next));
+    }
+    void outList(){
+        for(int i=1; i<=len; ++i){
+            cout<<a[i]<<" ";
+        }
+        cout<<endl;
+    }
+}Listx; 
+
+Listx Lx;
+
+void table_insertion_sort(){//表插入排序，相当于静态链表 
+    for(int i=2; i<=Lx.len; ++i){
+        int pre, p;
+        for(p=Lx.head; p && Lx.a[p]<Lx.a[i]; pre=p, p=Lx.next[p]);
+        if(p==0){
+            Lx.next[pre] = i;
+        } else if(p==Lx.head){
+            Lx.next[i] = Lx.head;
+            Lx.head = i;
+        } else {
+            Lx.next[pre] = i;
+            Lx.next[i] = p;
+        } 
+    }
+    //输出
+    for(int i=Lx.head; i; i = Lx.next[i]) 
+        cout<<Lx.a[i]<<" ";
+    cout<<endl;
+}
+
+void arrang_table() {
+    int p = Lx.head, q;
+    for(int i=1; i<Lx.len; ++i){
+        while(p < i) p = Lx.next[p];//第i个记录在表中的位置不应该小于 i，如果小于i，说明该元素已经被交换位置了，可以通过next继续寻找 
+        q = Lx.next[p];//指向下一个节点 
+        if(p!=i){//第p个元素应该在第i个位置 
+            swap(Lx.a[i], Lx.a[p]);
+            swap(Lx.next[i], Lx.next[p]);
+            Lx.next[i] = p;//该元素之前的位置 p，指向被移走的记录，使得以后可由while循环找回 
+        }
+        p = q;
+    }
+    
+    for(int i=1; i<=Lx.len; ++i) 
+        cout<<Lx.a[i]<<" ";
+    cout<<endl;
+}
+
+/*********************************************************************/ 
+
+int main()
+{
+    int i;
+    scanf("%d", &Lx.len);
+    for(i=1; i<=Lx.len; i++)
+        scanf("%d", &Lx.a[i]);
+//    benary_insertion_sort2();
+//    L.outList();
+    table_insertion_sort();
+    arrang_table();
+    return 0;
+}
+
+/*
+49 38 6 5 97 76 13 27 49
+*/

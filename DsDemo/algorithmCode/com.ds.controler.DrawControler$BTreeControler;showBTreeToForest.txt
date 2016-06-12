@@ -1,0 +1,78 @@
+class BTree{
+	public String x;
+	public BTree lchild;
+	public BTree rchild;
+	
+	public BTree(String x){
+		this.x = x;
+		lchild = null;
+		rchild = null;
+	}
+}
+
+class Forest{
+	public String x;
+	public List<Forest> childs;
+	public Forest(String x){
+		this.x = x;
+		childs = null;
+	}
+}
+
+public class Main {
+	private static int ti = 0;
+	private static String[] ts = null;
+	
+	private static BTree buildT(){
+		if(ti >= ts.length || ts[ti].equals("?")) {
+			ti++;
+			return null;
+		}
+		BTree T = new BTree(ts[ti++]);
+		T.lchild = buildT();
+		T.rchild = buildT();
+		return T;
+	}
+	
+	private static Map<String, Forest> map = new HashMap<String, Forest>();
+	
+	private static Forest toForest(BTree T){
+		if(T == null) return null;
+		if(map.get(T.x) == null) {
+			map.put(T.x, new Forest(T.x));
+		}
+		Forest F = map.get(T.x);
+		if(T.lchild != null){
+			BTree cur = T.lchild;
+			F.childs = new ArrayList<Forest>();
+			while(cur != null){
+				Forest f = new Forest(cur.x);
+				map.put(f.x, f);
+				F.childs.add(f);
+				cur = cur.rchild;
+			}
+		}
+		toForest(T.lchild);
+		toForest(T.rchild);
+		return F;
+	}
+	
+	private static void preForest(Forest F){
+		if(F == null) return;
+		System.out.print(F.x + " ");
+		if(F.childs != null) {
+			for(Forest f : F.childs)
+				preForest(f);
+		}
+	}
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String content = scan.nextLine();
+		 ts = content.split(" ");
+		 BTree T = null;
+		 T = buildT();
+		 Forest F = toForest(T);
+		 preForest(F);
+	}
+}

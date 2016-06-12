@@ -1,0 +1,67 @@
+class GLNode{
+	//tag 为true表示是一个独立的节点，
+    public boolean tag;
+    public String content;
+    public GLNodePtr ptr;
+    public static final boolean NODE = true;
+    public static final boolean LIST = false;
+    
+    public GLNode(){
+    	ptr = new GLNodePtr();
+    }
+    
+    class GLNodePtr{
+    	public GLNode hp, tp;
+    	public GLNodePtr(){
+    		hp = tp = null;
+    	}
+    }
+};
+
+GLNode createGListModel(String s){
+	GLNode L;
+    if("()".equals(s)){
+        //创建空表
+        L = null; 
+    } else { 
+        L = new GLNode();
+        if(s.indexOf(",")==-1 && s.indexOf("(")==-1 && s.indexOf(")")==-1){//原子结点 
+            if(!mp.containsKey(s)){
+                L.tag = GLNode.NODE;
+                L.content = s;
+            } else {//当s是只有一个大写字母组成的时候，说明它是一个子表，继续扩展 
+                return createGListModel(mp.get(s));
+            }
+        } else {//非原子结点 
+            L.tag = GLNode.LIST;
+            GLNode p = L, q;
+            s = s.substring(1, s.length()-1);
+            do{
+                //分离表头
+            	String hs = null;
+	            int k = 0;//记录尚未匹配的左括弧的个数
+	            int i;
+	            for(i = 0; i<s.length(); ++i) {
+	                if(s.charAt(i)=='(') ++k;
+	                if(s.charAt(i)==')') --k;
+	                if(k==0 && s.charAt(i)==',') break;
+	            }
+	            if(i < s.length()){
+	                hs = s.substring(0, i);
+	                s = s.substring(i+1, s.length());
+	            } else {
+	                hs = s;
+	                s = "";
+	            }
+                p.ptr.hp = createGListModel(hs);
+                q = p;
+                if(!"".equals(s)){//表尾不空 
+                    p = new GLNode();
+                    p.tag = GLNode.LIST;
+                    q.ptr.tp = p;    
+                }
+            }while(!"".equals(s));
+            q.ptr.tp = null;
+        }
+    }
+    return L;

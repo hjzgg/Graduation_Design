@@ -1,0 +1,29 @@
+//contents数组表示的 (u, v)边
+private ArrayList<ForestNode> buildForest(String[] contents){
+	 ArrayList<ForestNode> roots = new ArrayList<ForestNode>();
+	 Map<String, ForestNode> mp = new TreeMap<String, ForestNode>();
+	 Map<String, Integer> inDeg = new TreeMap<String, Integer>();
+	 for(int i=0; i<contents.length; ++i){
+		 String[] uv = contents[i].split(" ");//节点u和节点v有边
+		 if(!mp.containsKey(uv[0]))
+			 mp.put(uv[0], new ForestNode(uv[0]));
+		 if(!mp.containsKey(uv[1]))
+			 mp.put(uv[1], new ForestNode(uv[1]));
+		 mp.get(uv[0]).childList.add(mp.get(uv[1]));
+		 
+		 //节点入度的计算
+		 if(!inDeg.containsKey(uv[0]))
+			 inDeg.put(uv[0], 0);
+		 
+		 if(!inDeg.containsKey(uv[1]))
+			 inDeg.put(uv[1], 1);
+		 else 
+			 inDeg.put(uv[1], inDeg.get(uv[1])+1);
+	 }
+	 
+	 //森林中可能有多棵子森林
+	 for(String node : inDeg.keySet())
+		 if(inDeg.get(node) == 0)
+			 roots.add(mp.get(node));
+	 return roots;
+}

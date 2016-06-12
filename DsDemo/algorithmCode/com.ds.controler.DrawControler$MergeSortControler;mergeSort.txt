@@ -1,0 +1,63 @@
+#include<iostream>
+#include<cstring>
+#include<string>
+#include<queue>
+#include<map>
+#include<cstdlib> 
+#include<cstdio>
+const int INF=0X3f3f3f3f;
+using namespace std;
+
+typedef struct
+{
+   int a[100];
+   int len;
+   void outList(){
+           for(int i=1; i<=len; ++i)
+               cout<<a[i]<<" ";
+           cout<<endl;
+   }
+}list;
+list L;
+
+void Merge(int lr, int rr)//归并排序 
+{
+   int atemp[100], mid=(lr+rr)/2;//atemp[]存放两个有序表合并后的结果
+   int i, j, k;
+   for(i=lr, j=mid+1, k=0; i<=mid && j<=rr; )//将两个有序表的合并代码 
+     {
+         if(L.a[i]<=L.a[j])
+           atemp[k++]=L.a[i++];
+         else
+          atemp[k++]=L.a[j++];     
+     }
+   if(i>mid)
+     for(k; j<=rr; j++)
+       atemp[k++]=L.a[j];
+   if(j>rr)
+     for(k; i<=mid; i++)
+       atemp[k++]=L.a[i]; 
+   memcpy(L.a+lr, atemp, sizeof(int)*k);//将两段儿有序表合并后的结果 
+}                                     //复制到原来对应的位置上 
+
+void Msort(int ld, int rd)
+{
+   if(ld<rd)
+     {
+         int mid=(ld+rd)/2;
+         Msort(ld, mid);
+         Msort(mid+1, rd);
+         Merge(ld, rd);//回溯法合并有序 序列 
+     }
+}
+
+
+int main() {
+   int i;
+   scanf("%d", &L.len);
+   for(i=1; i<=L.len; i++)
+     scanf("%d", &L.a[i]);
+    Msort(1, L.len); 
+    L.outList();
+    return 0;
+}

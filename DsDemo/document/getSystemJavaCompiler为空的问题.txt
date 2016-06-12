@@ -1,0 +1,41 @@
+private static final String[] defaultToolsLocation = { "lib", "tools.jar" };
+private Class<?> findSystemToolClass(String toolClassName)
+        throws MalformedURLException, ClassNotFoundException {
+    // try loading class directly, in case tool is on the bootclasspath
+    try {
+        return Class.forName(toolClassName, false, null);
+    } catch (ClassNotFoundException e) {
+        trace(FINE, e);
+
+        // if tool not on bootclasspath, look in default tools location (tools.jar)
+        ClassLoader cl = (refToolClassLoader == null ? null : refToolClassLoader.get());
+        if (cl == null) {
+            File file = new File(System.getProperty("java.home"));
+            if (file.getName().equalsIgnoreCase("jre"))
+                file = file.getParentFile();
+            for (String name : defaultToolsLocation)
+                file = new File(file, name);
+
+            // if tools not found, no point in trying a URLClassLoader
+            // so rethrow the original exception.
+            if (!file.exists())
+                throw e;
+
+            URL[] urls = { file.toURI().toURL() };
+            trace(FINE, urls[0].toString());
+
+            cl = URLClassLoader.newInstance(urls);
+            refToolClassLoader = new WeakReference<ClassLoader>(cl);
+        }
+
+        return Class.forName(toolClassName, false, cl);
+    }
+}
+
+ JavaCompiler compiler = ToolProvider.getSystemJavaCompiler(); NullPointerException
+ 
+打印 System.out.println(System.getProperty("java.home")); 如下：
+ 	C:\Program Files (x86)\Java\jre6
+defaultToolsLocation = { "lib", "tools.jar" }; 也就是最终到
+	C:\Program Files (x86)\Java\jre6\lib\tools.jar中寻找tools.jar
+然而jre6\lib中没有tools.jar, 而是在C:\Program Files (x86)\Java\jdk\lib中。最直接的办法就是将它复制进去就行了。

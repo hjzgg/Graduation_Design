@@ -1,0 +1,11 @@
+private void adjustView(JScrollPane scrollpaen, int x, int y){
+	JScrollBar hsb = scrollpaen.getHorizontalScrollBar();
+	JScrollBar vsb = scrollpaen.getVerticalScrollBar();
+	JViewport view = scrollpaen.getViewport();
+	//返回一个矩形，其原位置在 getViewPosition，大小为 getExtentSize。这是视图在视图坐标中的可见部分。 
+	Rectangle rect = view.getViewRect();
+	int movex = x - (rect.x+rect.width/2);
+	int movey = y - (rect.y+rect.height/2);
+	hsb.setValue(hsb.getValue() + movex);
+	vsb.setValue(vsb.getValue() + movey);
+}

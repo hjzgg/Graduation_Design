@@ -1,0 +1,75 @@
+//树状数组～～poj Buy Tickets2828线段树或者树状数组（队列中倒序插队）
+#include<iostream>
+#include<cstring>
+#include<cstdio>
+#include<algorithm>
+
+#define N 200005
+using namespace std;
+
+int tree[N];
+int pos[N], val[N];
+int ret[N];
+int n;
+
+int lowbit(int x){
+    return x&(-x);
+}
+
+void buildT(){
+    for(int i=1; i<=n; ++i){
+        tree[i]=0;
+        for(int j=i-lowbit(i)+1; j<=i; ++j)
+            tree[i]+=1;
+    }
+}
+
+void updateT(int x){
+    while(x<=n){
+        tree[x]-=1;
+        x+=lowbit(x);
+    }
+}
+
+int getSum(int x){
+    int s=0;
+    while(x>0){
+        s+=tree[x];
+        x-=lowbit(x);    
+    }
+    return s;
+}
+
+int main(){
+    while(scanf("%d", &n)!=EOF){
+        buildT(); 
+        for(int i=1; i<=n; ++i){
+            scanf("%d%d", &pos[i], &val[i]);
+            ret[i]=-1;
+        }
+        for(int i=n; i>=1; --i){
+            int ld=1, rd=n;
+            bool flag=false;
+            while(ld<=rd){
+                int mid=(ld+rd)>>1;
+                int s=getSum(mid);
+                //如果当前的位置没有人插入并且该位置的之前的人数恰好为pos[i] 
+                if(ret[mid]==-1 && s==pos[i]+1){ 
+                    updateT(mid);
+                    ret[mid]=val[i];
+                    flag=true;//已经找到不用在继续寻找了 
+                    break;
+                }
+                else if(s>=pos[i]+1)
+                    rd=mid-1;
+                else ld=mid+1;
+            }
+            if(!flag) ret[rd+1]=val[i];//直到找到当前的位置没有人插入并且该位置的之前的人数恰好为pos[i]  
+        }
+        printf("%d", ret[1]);
+        for(int i=2; i<=n; ++i)
+             printf(" %d", ret[i]);
+        printf("\n"); 
+    } 
+    return 0; 
+}

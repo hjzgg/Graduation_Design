@@ -1,0 +1,196 @@
+//用链表实现表达式树
+#include<iostream> 
+#include<ctype.h>
+#include<cstring>
+#define N 10000
+#define optd 1
+#define optr 2
+using namespace std;
+
+class node
+{
+public:
+   node *lchild, *rchild;
+   int flag;//区分当前节点是操作符还是操作数 
+   double k;
+   char ch;
+};
+
+char formula[1000];
+
+void buildTree(node* &T, int ld, int rd)
+{
+   int i;
+   for(i=ld; i<rd; ++i)
+     if(!isdigit(formula[i])) 
+       break;
+   if(i>=rd)//最后全部为数字的时候 
+   {
+       T=new node();
+       T->flag=optd;
+       sscanf(formula+ld, "%lf", &T->k);
+       return ; 
+   }
+   int pAS=-1, pMD=-1;//分别表示加减号， 乘除号所在的位置 
+   int paren=0;//记录左括弧相对于右括弧出现的数目 
+   for(i=ld; i<rd; ++i)
+   {
+      switch(formula[i])
+      {
+         case '(': ++paren;  break;
+         case ')': --paren;  break;
+
+         //最后计算的运算符一定是在括弧的外边，不会包含在括弧里边 
+         case '+':
+         case '-': 
+                   if(paren==0)   pAS=i;
+                   break;
+         case '*':
+         case '/': 
+               if(paren==0) pMD=i;
+                   break;
+      }
+   }
+   if(pAS<0)  pAS=pMD;
+   if(pAS<0) //说明没有找到括弧外边的运算符，则脱掉一对括弧重新寻找 
+     return buildTree(T, ld+1, rd-1);
+   T=new node();
+   T->flag=optr;//表示存储操作符
+   T->ch=formula[pAS];
+   buildTree(T->lchild, ld, pAS);
+   buildTree(T->rchild, pAS+1, rd);
+}
+
+void printTree(node *T)//中序输出表达式树 
+{
+   if(T)//非末端节点 
+   {
+      printTree(T->lchild);
+      if(T->flag==optd)
+        cout<<T->k<<" ";
+      else 
+        cout<<T->ch<<" ";
+      printTree(T->rchild);
+   }
+} 
+
+int main()
+{
+   while(cin>>formula)
+   {
+      node *T=NULL; 
+      buildTree(T, 0, strlen(formula));
+      printTree(T);
+   }
+   return 0;
+}
+
+
+/*
+    利用栈对表达式求值
+*/
+#include<iostream> 
+#include<string> 
+#include<stack>
+#include<cstdio>
+using namespace std;
+
+class node
+{
+public:
+     double ret;
+     string prefix, suffix;//前缀表达式和后缀表达式 
+     node()
+     {
+         ret=0;
+         prefix=suffix=""; 
+     } 
+};
+
+stack<node>optd;//操作数栈
+stack<char>optr;//操作符栈
+
+char formula[1000];//表达式以"=" 结束 
+
+int cmp(char ch)//定义符号的优先级
+{
+   switch(ch)
+   {
+      case '#': return -2;
+      case '=': return -1;
+      case '+':
+      case '-': return 1;
+      case '*':
+      case '/': return 2;
+      case '(': return 3;
+      case ')': return 0;
+   }
+   return -2;
+}
+
+double deal(double x, char ch, double y)
+{
+   switch(ch)
+   {
+       case '+': return x+y;
+       case '-': return x-y;
+       case '*': return x*y;
+       case '/': return x/y;
+   }
+   return 0.0;
+}
+
+void cal()
+{
+   int i=0, n;
+   node num, aTmp, bTmp;
+   while(optr.top()!='=')
+   {
+      if(formula[i]>='0' && formula[i]<='9')
+      {
+           sscanf(formula+i, "%lf%n", &num.ret, &n);
+           num.prefix.assign(formula+i, n);
+           num.suffix.assign(formula+i, n);
+           i+=n;
+           optd.push(num);
+      }
+      else
+      {
+           if(optr.top()=='(' && formula[i]==')')//消除一对括弧 
+           {
+	         optr.pop();
+	         ++i;
+	       }
+           if(cmp(formula[i]) > cmp(optr.top()) || optr.top()=='(')//当前运算符大于栈顶运算符直接进栈
+    	   {
+	         optr.push(formula[i]);
+	         ++i;
+		   }
+		   else
+		   {
+		        char ch=optr.top(), preTmp[]={ch, ' ', '\0'}, sufTmp[]={' ', ch, '\0'} ;
+		        optr.pop();//弹出一个栈顶操作符 
+		        bTmp=optd.top(); optd.pop();//得到第二个操作数 
+		        aTmp=optd.top(); optd.pop();//得到第一个操作数 
+		        aTmp.ret=deal(aTmp.ret, ch, bTmp.ret);
+		        
+		        aTmp.suffix+=" " + bTmp.suffix + sufTmp;//得到运算后的后缀式子
+		        aTmp.prefix=preTmp + aTmp.prefix + " " + bTmp.prefix;//得到运算前的后缀式子
+		        optd.push(aTmp);//不要忘记将计算的结果放入栈中 
+		    }
+      }
+   }
+   optr.pop();//别忘记弹出栈顶上的'=' 
+}
+
+int main()
+{
+   optr.push('#');//初始化栈顶操作符是‘#’ 
+   while(cin>>formula)
+   {
+       cal();
+       node ans=optd.top(); optd.pop();
+       cout<<"表达式结果："<<ans.ret<<endl<<"前缀试："<<ans.prefix+'='<<endl<<"后缀试："<<ans.suffix+'='<<endl; 
+   }
+   return 0;
+}

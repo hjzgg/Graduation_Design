@@ -1,0 +1,72 @@
+/*
+poj 2492A Bug's Life(并查集)
+目大意：输入一个数t，表示测试组数。然后每组第一行两个数字n,m，n表示有n只昆虫，编号从1—n,m表示下面要输入m行交配情况，每行两个整数，表示这两个编号的昆虫为异性，要交配。
+要求统计交配过程中是否出现冲突，即是否有两个同性的昆虫发生交配。
+
+思路：并查集
+   将同性的昆虫放入集合之中，如果输入的昆虫u, v同时出现在了集合中，那么 u，v就是同性的！发生了同性交配的可能！
+*/
+
+#include <string>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+
+using namespace std;
+int n, m;
+int f[2010];
+int  mark[2010];//mark[i]表示 与 i 交配的昆虫的编号！
+
+int getFather(int x){
+   return x==f[x] ? x : f[x]=getFather(f[x]);
+}
+
+void Union(int a, int b){
+    int fa=getFather(a), fb=getFather(b);
+    if(fa!=fb)
+       f[fa]=fb;
+}
+
+int main(){
+   int t, cnt=0;
+   scanf("%d", &t);
+   while(t--){
+      scanf("%d%d", &n, &m);
+      for(int i=1; i<=n; ++i)
+     	 f[i]=i;
+      memset(mark, 0, sizeof(mark));
+      int flag=1;
+      while(m--){
+         int u, v;
+         scanf("%d%d", &u, &v);
+         if(flag){
+            if(getFather(u) == getFather(v)){
+               flag=0;
+               continue;
+             }   
+             if(!mark[u] && !mark[v]){
+               mark[u]=v;
+               mark[v]=u;
+             }
+             else if(!mark[u]){
+               mark[u]=v;
+               Union(u, mark[v]); //如果v配对了，u没有配对，那么u和mark[v]就是同性昆虫，放入集合之中
+             }
+             else if(!mark[v]){
+               mark[v]=u;        
+               Union(v,mark[u]);//,,,,,,
+             }
+             else{ 
+               Union(u, mark[v]);//如果之前u和v都已经配对，现在u和v进行配对， 那么u和mark[v]是同性， v和mark[u]是同性！
+               Union(v, mark[u]);
+             }
+         }
+      }
+      printf("Scenario #%d:\n",++cnt);
+        if (flag==1) 
+            printf("No suspicious bugs found!\n");
+        else
+            printf("Suspicious bugs found!\n");
+        printf("\n");
+   }
+}

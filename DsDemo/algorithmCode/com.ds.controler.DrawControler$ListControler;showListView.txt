@@ -1,0 +1,28 @@
+class List{
+	public int x;
+	public List next;
+	
+	public List(int x){
+		this.x = x;
+		next = null;
+	}
+}
+
+public class Main {
+	public static void main(String[] args){
+		Scanner scan = new Scanner(System.in);
+		int n = scan.nextInt();
+		List head = new List(0), pre = head;
+		for(int i=0; i<n; ++i){
+			List cur = new List(scan.nextInt());
+			pre.next = cur;
+			pre = cur;
+		}
+		
+		for(pre = head.next; pre != null; pre = pre.next){
+			if(pre != head.next)
+				System.out.print(" ");
+			System.out.print(pre.x);
+		}
+	}
+}

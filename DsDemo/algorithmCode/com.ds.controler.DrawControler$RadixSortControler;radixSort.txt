@@ -1,0 +1,112 @@
+#include<iostream> 
+#include<cstring>
+#include<cstdio>
+#include<algorithm>
+#include<cmath>
+#include<queue> 
+#define N 1000
+using namespace std;
+
+/*
+    题目：对基数排序的练习, 它是一种很特别的方法，它不是基于比较进行排序的，而是采用多关键字排序思想，
+    借助"分配" 和 "收集" 两种操作对单逻辑关键字进行排序， 分为最高位优先MSD排序和最低为优LSD先排序 
+*/
+
+int radix[]={1, 10, 100, 1000};//每个数字的位数最多是3位
+
+int cnt[10];
+int a[N], bucket[N];
+int n; 
+int k;//记录数字中位数最多的 
+
+/*
+（1）LSD最低位优先法实现
+
+最低位优先法首先依据最低位关键码Kd对所有对象进行一趟排序，
+
+再依据次低位关键码Kd-1对上一趟排序的结果再排序，
+
+依次重复，直到依据关键码K1最后一趟排序完成，就可以得到一个有序的序列。
+
+使用这种排序方法对每一个关键码进行排序时，不需要再分组，而是整个对象组。
+*/
+void LSD_radixSort(){
+    for(int i=1; i<=k; ++i){
+        memset(cnt, 0, sizeof(cnt));
+        //统计各个桶中所盛数据个数, 关键字相同的数字放入到同一个桶中 
+        for(int j=1; j<=n; ++j)
+            ++cnt[a[j]%radix[i]/radix[i-1]];
+        //cnt[i]表示第i个桶的右边界索引
+        for(int j=1; j<10; ++j)
+            cnt[j] += cnt[j-1];
+         //把数据依次装入桶(注意装入时候的分配技巧)
+        for(int j=n; j>=1; --j){//这里要从右向左扫描，保证排序稳定性 
+            int x = a[j]%radix[i]/radix[i-1]; //求出关键码的第k位的数字， 也就是第x个桶的编号， 例如：576的第3位是5 
+            bucket[cnt[x]] = a[j];//放入对应的桶中，cnt[x]是第x个桶的右边界索引 
+            --cnt[x];//对应桶的装入数据索引减一  
+        }
+        memcpy(a, bucket, sizeof(int)*(n+1));
+    }
+}
+
+/*
+    （2）MSD最高位优先法实现
+
+最高位优先法通常是一个递归的过程：
+
+<1>先根据最高位关键码K1排序，得到若干对象组，对象组中每个对象都有相同关键码K1。
+
+<2>再分别对每组中对象根据关键码K2进行排序，按K2值的不同，再分成若干个更小的子组，每个子组中的对象具有相同的K1和K2值。
+
+<3>依此重复，直到对关键码Kd完成排序为止。
+
+<4> 最后，把所有子组中的对象依次连接起来，就得到一个有序的对象序列。
+*/
+
+void MSD_radixSort(int ld, int rd, int radixI){//[ld, rd]是a数组的待排序的区间，radixI是当前这段数组每个数字的基数 
+    int cnt[11];//必须每个栈中都定义 
+    memset(cnt, 0, sizeof(cnt));
+    //统计各个桶中所盛数据个数, 关键字相同的数字放入到同一个桶中 
+    for(int j=ld; j<=rd; ++j)
+        ++cnt[a[j]%radix[radixI]/radix[radixI-1]];
+    //cnt[i]表示第i个桶的右边界索引
+    for(int j=1; j<=10; ++j)
+        cnt[j] += cnt[j-1];
+     //把数据依次装入桶(注意装入时候的分配技巧)
+    for(int j=rd; j>=ld; --j){//这里要从右向左扫描，保证排序稳定性 
+        int x = a[j]%radix[radixI]/radix[radixI-1]; //求出关键码的第k位的数字， 也就是第x个桶的编号， 例如：576的第3位是5 
+        bucket[cnt[x]] = a[j];//放入对应的桶中，cnt[x]是第x个桶的右边界索引 
+        --cnt[x];//对应桶的装入数据索引减一  
+    }
+    for(int i=ld, j=1; i<=rd; ++i, ++j)//重排区间[ld, rd], a数组区间[ld,rd]对应bucket数组区间[1, rd-ld+1] 
+        a[i] = bucket[j];
+         
+    for(int i=0; i<10; ++i){//对各个桶中的数据在进行下一个关键字的排序 
+        int ldd = ld + cnt[i];
+        int rdd = ld + cnt[i+1] - 1; //获得子桶的子区间[ldd, rdd] 
+        if(ldd < rdd && radixI>1)
+            MSD_radixSort(ldd, rdd, radixI-1);
+    }
+}
+
+int main(){
+    cin>>n;
+    k = 0; 
+    for(int i=1; i<=n; ++i){
+        cin>>a[i];
+        k = max(k, (int)log10(a[i])+1);
+    }
+//    LSD_radixSort();
+//    for(int i=1; i<=n; ++i) 
+//        cout<<a[i]<<" " ;
+//    cout<<endl;
+
+    MSD_radixSort(1, n, k);
+    for(int i=1; i<=n; ++i) 
+        cout<<a[i]<<" " ;
+    cout<<endl;
+    return 0;
+}
+/*
+329 457 657 839 436 720 355
+*/

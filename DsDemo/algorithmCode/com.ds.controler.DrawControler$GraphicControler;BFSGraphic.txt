@@ -1,0 +1,107 @@
+class Node{
+	public String x;
+	public List<Edge> edges = new ArrayList<Edge>();
+	public Node(String x){
+		this.x = x;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((edges == null) ? 0 : edges.hashCode());
+		result = prime * result + ((x == null) ? 0 : x.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (edges == null) {
+			if (other.edges != null)
+				return false;
+		} else if (!edges.equals(other.edges))
+			return false;
+		if (x == null) {
+			if (other.x != null)
+				return false;
+		} else if (!x.equals(other.x))
+			return false;
+		return true;
+	}
+	
+}
+
+class Edge{
+	public Node to;
+	public Node from;
+	public int dist;
+	public Edge(Node from, Node to, int dist) {
+		super();
+		this.to = to;
+		this.from = from;
+		this.dist = dist;
+	}
+	
+	@Override
+	public String toString(){
+		return from.x + " " + to.x + " " + dist;
+	}
+}
+
+public class Main {
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String data = scan.nextLine();
+		 String[] edges = data.split(";");
+		 //默认有权值, 无向图
+		 List<Node> nodes = buildG(edges);
+		 for(Node node : nodes) {
+			 if(!vis.contains(node))
+				 bfs(node);
+		 }
+	}
+	
+	private static Set<Node> vis = new HashSet<Node>();
+	
+	private static void bfs(Node node){
+		Queue<Node> queue = new LinkedList<Node>();
+		queue.add(node);
+		vis.add(node);
+		while(!queue.isEmpty()){
+			Node cur = queue.poll();
+			System.out.print(cur.x + " ");
+			for(Edge edge : cur.edges)
+				if(!vis.contains(edge.to)){
+					vis.add(edge.to);
+					queue.add(edge.to);
+				}
+		}
+	}
+
+	private static List<Node> buildG(String[] edges) {
+		Map<String, Node> map = new HashMap<String, Node>();
+		for(String edge : edges){
+			 String[] msgs = edge.split(" ");
+			 if(map.get(msgs[0]) == null)
+				 map.put(msgs[0], new Node(msgs[0]));
+			 if(map.get(msgs[1]) == null) 
+				 map.put(msgs[1], new Node(msgs[1]));
+			 Node from = map.get(msgs[0]);
+			 Node to = map.get(msgs[1]);
+			 Edge fromTo = new Edge(from, to, Integer.valueOf(msgs[2]));
+			 Edge toFrom = new Edge(to, from, Integer.valueOf(msgs[2]));
+			 from.edges.add(fromTo);
+			 to.edges.add(toFrom);
+		}
+		List<Node> nodes = new ArrayList<Node>();
+		for(String key : map.keySet())
+			nodes.add(map.get(key));
+		return nodes;
+	}
+}

@@ -1,0 +1,176 @@
+#include<iostream>
+#include<cstring>
+#include<string>
+#include<queue>
+#include<map>
+#include<cstdlib> 
+#include<cstdio>
+const int INF=0X3f3f3f3f;
+using namespace std;
+
+typedef struct
+{
+   int a[100];
+   int len;
+   void outList(){
+           for(int i=1; i<=len; ++i)
+               cout<<a[i]<<" ";
+           cout<<endl;
+   }
+}list;
+list L;
+
+
+int smaller(int a, int b)
+{
+   return a>b?b:a;
+}
+/**********************************************************************************/
+void sample_selection_sort()//简单选择排序 
+{
+    int i, j, k;
+    for(i=1; i<=L.len; i++)
+     {
+         k=i;
+         for(j=i+1; j<=L.len; j++)
+           if(L.a[k]>L.a[j])
+             k=j;
+        if(k!=i)
+          {
+              L.a[i]^=L.a[k];
+              L.a[k]^=L.a[i];
+              L.a[i]^=L.a[k];
+          }
+     }
+} 
+/**********************************************************************************/
+int tree[400];
+void tree_choose_sort(int ld, int rd, int p)//树形选择排序，和线段树差不多 
+{
+   if(rd==ld)
+     tree[p]=L.a[ld];
+   else
+     {
+         int mid=(ld+rd)/2;
+        tree_choose_sort(ld, mid, p<<1);
+        tree_choose_sort(mid+1, rd, p<<1|1);
+        tree[p]=smaller(tree[p<<1], tree[p<<1|1]);
+     }
+}
+
+void update_tree(int ld, int rd, int p, int key)//树形选择排序
+{
+    if(rd==ld)
+     {
+       if(key==tree[p])
+          tree[p]=INF;
+     } 
+    else
+     {
+         int mid=(ld+rd)/2;
+         if(key==tree[p<<1]) 
+            update_tree(ld, mid, p<<1, key);
+         else
+            update_tree(mid+1, rd, p<<1|1, key);
+         tree[p]=smaller(tree[p<<1], tree[p<<1|1]);
+     }
+}
+/**********************************************************************************/
+
+typedef struct tree//树形选择排序 
+{
+   int d;
+   struct tree *lchild;
+   struct tree *rchild;
+}*TREE;
+void build_tree(TREE &T, int ld, int rd)//树形选择排序
+{
+   if(ld==rd)
+    { 
+       T->lchild=T->rchild=NULL;
+       T->d=L.a[ld];
+    }
+   else
+   {
+          int mid=(rd+ld)/2;
+          T=(TREE)malloc(sizeof(tree));
+          T->lchild=(TREE)malloc(sizeof(tree));
+          T->rchild=(TREE)malloc(sizeof(tree));
+       build_tree(T->lchild, ld, mid);
+       build_tree(T->rchild, mid+1, rd);
+       T->d=smaller(T->lchild->d, T->rchild->d);
+   }
+}
+
+void Update_tree(TREE &T, int key)//树形选择排序
+{
+   if(T)
+   {
+      if(!T->lchild && !T->rchild)
+        {
+            if(T->d==key)
+              T->d=INF;
+        }
+      else
+       {
+             if(key==T->lchild->d)
+               Update_tree(T->lchild, key);
+             else if(key==T->rchild->d)
+               Update_tree(T->rchild, key);
+             T->d=smaller(T->lchild->d, T->rchild->d);
+       }
+   }
+}
+/**********************************************************************************/
+
+void heapAdjust(int ld, int rd){//堆排序, 排序区间[ld，rd] 
+    int rc = L.a[ld];
+    int cur = ld;
+    for(int p = ld*2; p<=rd; p=p*2){
+        if(p<rd && L.a[p] > L.a[p+1]) ++p;//取左右子树的最小值
+        if(rc < L.a[p]) break;//如果父节点的值比左右子树的值都小，那么已经调整好了，已经是小堆顶了
+        L.a[cur] = L.a[p];//否则交换父节点和左右子树最小的子树的值，父节点的值存在rc中，所以只要将最小子树的值赋给父节点就好 
+        cur = p;
+    }
+    L.a[cur] = rc;
+}
+
+/**********************************************************************************/
+
+int main() {
+    int i;
+   scanf("%d", &L.len);
+   for(i=1; i<=L.len; i++)
+     scanf("%d", &L.a[i]);
+   //selection_sort();//选择排序 
+   
+//   tree_choose_sort(1, L.len, 1);//树形选择排序 
+//   
+//   int n=L.len;
+//   while(n--)
+//    {
+//       printf("%d ", tree[1]);
+//       update_tree(1, L.len, 1, tree[1]);
+//    }
+   
+//   TREE T;//树形选择排序 
+//   build_tree(T, 1, L.len);
+//   int n=L.len;
+//   while(n--)
+//    {
+//       printf("%d ", T->d);
+//       Update_tree(T, T->d);
+//    }
+
+
+    for(int i=L.len/2; i>=1; --i)//将整个区间调整成小堆顶 
+        heapAdjust(i, L.len);
+    
+    for(int i=1; i<=L.len; ++i) {
+        cout<<L.a[1]<<" "; 
+        L.a[1] = L.a[L.len-i+1];//将最后一个元素赋给第一个元素 
+        heapAdjust(1, L.len-i);//重新调整堆 
+    }
+    cout<<endl;
+    return 0;
+}

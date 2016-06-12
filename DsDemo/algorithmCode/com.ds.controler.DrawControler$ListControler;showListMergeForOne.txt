@@ -1,0 +1,54 @@
+class List{
+	public int x;
+	public List next;
+	
+	public List(int x){
+		this.x = x;
+		next = null;
+	}
+}
+
+public class Main {
+	public static void main(String[] args){
+		Scanner scan = new Scanner(System.in);
+		int n1 = scan.nextInt();
+		int n2 = scan.nextInt();
+		List head1 = new List(0), cur1 = head1;
+		List head2 = new List(0), cur2 = head2;
+		for(int i = 0; i < n1; ++i){
+			List cur = new List(scan.nextInt());
+			cur1.next = cur;
+			cur1 = cur;
+		}
+		for(int i = 0; i < n2; ++i){
+			List cur = new List(scan.nextInt());
+			cur2.next = cur;
+			cur2 = cur;
+		}
+		
+		//不断地将 List2中的内容插入到List1中
+		List pre1 = head1;
+		for(cur1=head1.next, cur2 = head2.next; cur1 != null && cur2 != null;){
+			if(cur1.x > cur2.x){
+				//保留list2的下一个节点
+				List next2 = cur2.next; 
+				//将cur2节点插入到cur1节点的前面
+				pre1.next = cur2;
+				cur2.next = cur1;
+				pre1 = cur2;
+				cur2 = next2;
+			} else {
+				pre1 = cur1;
+				cur1 = cur1.next;
+			}
+		}
+		
+		pre1.next = cur2;
+		
+		for(cur1 = head1.next; cur1 != null; cur1 = cur1.next){
+			if(cur1 != head1.next)
+				System.out.print(" ");
+			System.out.print(cur1.x);
+		}
+	}
+}

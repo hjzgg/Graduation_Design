@@ -1,0 +1,79 @@
+#include<iostream>
+#include<cstring>
+#include<string>
+#include<queue>
+#include<map>
+#include<cstdlib> 
+#include<cstdio>
+const int INF=0X3f3f3f3f;
+using namespace std;
+
+typedef struct
+{
+   int a[100];
+   int len;
+   void outList(){
+           for(int i=1; i<=len; ++i)
+               cout<<a[i]<<" ";
+           cout<<endl;
+   }
+}list;
+list L;
+
+int partition(int low, int high)//将数据元素划分为左边都小于枢轴，右边元素都大于枢轴 
+{
+   //采用三者取中的方法选择枢轴 
+   if((L.a[high]-L.a[low]) * (L.a[high]-L.a[(low+high)/2]) < 0)
+            swap(L.a[low], L.a[high]);
+   else if((L.a[(low+high)/2]-L.a[low]) *(L.a[(low+high)/2]-L.a[high]) < 0)
+           swap(L.a[low], L.a[(low+high)/2]);
+   int pivotkey=L.a[low];// 枢轴关键字
+   while(low<high)
+     {
+         while(low<high && L.a[high]>=pivotkey)
+           high--;
+         L.a[low]=L.a[high];
+         while(low<high && L.a[low]<=pivotkey)
+           low++;
+         L.a[high]=L.a[low];
+     }
+   L.a[low]=pivotkey; 
+   return low;
+} 
+
+
+int partitionTwo(int ld, int rd){
+	　　int mid = (ld+rd)>>1;
+	　　if((a[mid]-a[ld]) * (a[mid]-a[rd]) < 0)
+		　　　　swap(a[mid], a[ld]);
+	　　else if((a[rd]- a[ld]) * (a[rd]-a[mid]) < 0)
+		　　　　swap(a[rd], a[ld]);
+		
+	　　int i=ld;//使得表a[ld.....i] 中的所有的元素都是小于pivot的元素，初始表为空， a[ld]表示枢轴 
+	　　int pivot = a[ld];
+	　　for(int j=ld+1; j<=rd; ++j)
+		　　　　if(a[j] < pivot)
+			　　　　　　swap(a[++i], a[j]);
+	　　swap(a[i], a[ld]);
+	　　return i;
+}
+void Qsort(int low, int high)//快速排序 
+{
+   if(low<high)
+    {
+       int p=partition(low, high);
+       Qsort(low, p-1);
+       Qsort(p+1, high);
+    }
+}
+
+
+int main() {
+   int i;
+   scanf("%d", &L.len);
+   for(i=1; i<=L.len; i++)
+     scanf("%d", &L.a[i]);
+    Qsort(1, L.len); 
+    L.outList();
+    return 0;
+}

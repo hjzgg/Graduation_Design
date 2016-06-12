@@ -1,0 +1,20 @@
+public class Main {
+	
+	private static boolean BF(String s, String t){
+		if(s.length() < t.length()) return false;
+		for(int i=0; i <= s.length()-t.length(); ++i){
+			for(int k=i, j=0; j < t.length(); ++j, ++k){
+				if(s.charAt(k) != t.charAt(j)) break;
+				if(j == t.length()-1) return true;
+			}
+		}
+		return false;
+	}
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String s = scan.nextLine();
+		 String t = scan.nextLine();
+		 System.out.println(BF(s, t));
+	}
+}

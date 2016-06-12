@@ -1,0 +1,127 @@
+class Node{
+	public String x;
+	public List<Edge> edges = new ArrayList<Edge>();
+	public Node(String x){
+		this.x = x;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((edges == null) ? 0 : edges.hashCode());
+		result = prime * result + ((x == null) ? 0 : x.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (x == null) {
+			if (other.x != null)
+				return false;
+		} else if (!x.equals(other.x))
+			return false;
+		return true;
+	}
+	
+}
+
+class Edge{
+	public Node to;
+	public Node from;
+	public int dist;
+	public Edge(Node from, Node to, int dist) {
+		super();
+		this.to = to;
+		this.from = from;
+		this.dist = dist;
+	}
+	
+	@Override
+	public String toString(){
+		return from.x + " " + to.x + " " + dist;
+	}
+}
+
+
+public class Main {
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String data = scan.nextLine();
+		 String[] edges = data.split(";");
+		 //默认有权值, 无向图
+		 List<Node> nodes = buildG(edges);
+		 dijkstra(nodes);
+	}
+	
+	private static Set<Node> vis = new HashSet<Node>();
+	//记录源点到其他节点的最短距离
+	private static Map<Node, Integer> dist = new HashMap<Node, Integer>();
+	private static void dijkstra(List<Node> nodes){
+		//默认最小的节点是源节点
+		Collections.sort(nodes, new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				return o1.x.compareTo(o2.x);
+			}
+		});
+		
+		for(int i=0; i<nodes.size(); ++i){
+			dist.put(nodes.get(i), Integer.MAX_VALUE/2);
+		}
+		
+		Node root = nodes.get(0);
+		dist.put(root, 0);
+		vis.add(root);
+		for(int i=1; i < nodes.size(); ++i){
+			Node nextRoot = null;
+			int minDist = Integer.MAX_VALUE;
+			for(Edge edge : root.edges){
+				if(!vis.contains(edge.to) && dist.get(edge.to) > dist.get(edge.from) + edge.dist){//(或者 dist.get(edge.to) > dist.get(root) + edge.dist)
+					dist.put(edge.to, dist.get(edge.from) + edge.dist);
+				}
+				
+				if(!vis.contains(edge.to) && minDist > dist.get(edge.to)){
+					nextRoot = edge.to;
+					minDist = dist.get(edge.to);
+				}
+			}
+			
+			if(nextRoot != null) {
+				root = nextRoot;
+				vis.add(root);
+			}
+		}
+		
+		for(Node key : dist.keySet()){
+			System.out.println("1-->" + key.x + " : " + dist.get(key));
+		}
+	}
+
+	private static List<Node> buildG(String[] edges) {
+		Map<String, Node> map = new HashMap<String, Node>();
+		for(String edge : edges){
+			 String[] msgs = edge.split(" ");
+			 if(map.get(msgs[0]) == null)
+				 map.put(msgs[0], new Node(msgs[0]));
+			 if(map.get(msgs[1]) == null) 
+				 map.put(msgs[1], new Node(msgs[1]));
+			 Node from = map.get(msgs[0]);
+			 Node to = map.get(msgs[1]);
+			 Edge fromTo = new Edge(from, to, Integer.valueOf(msgs[2]));
+			 Edge toFrom = new Edge(to, from, Integer.valueOf(msgs[2]));
+			 from.edges.add(fromTo);
+			 to.edges.add(toFrom);
+		}
+		List<Node> nodes = new ArrayList<Node>();
+		for(String key : map.keySet())
+			nodes.add(map.get(key));
+		return nodes;
+	}
+}

@@ -1,0 +1,98 @@
+/*
+     森林转换成二叉树
+     思路：u的孩子节点为v1, v2, v3....（v1,v2,....互为兄弟节点） 
+     那么将u的一个孩子节点（v1）连在u的左子树上，那么其他的孩子节点都连在v1的右子树上！ 
+*/ 
+#include<iostream>
+#include<cstring>
+#include<cstdio>
+#include<algorithm>
+using namespace std;
+int g[15][15];
+int par[15];//如果该节点有父亲节点说明该节点不是一个独立的点！ 
+int vis[15];
+
+struct Tree{
+    int  d;
+    Tree *lchild, *rchild; 
+    Tree(){
+       lchild=rchild=NULL; 
+    }
+    
+    Tree(int x){
+       lchild=rchild=NULL; 
+       d=x;
+    }
+};
+int n, m;
+
+void buildT(Tree* &T, int u){
+    bool flag=false;
+    T=new Tree(u);
+    Tree *cur=T; 
+    vis[u]=1;
+    for(int v=1; v<=n; ++v)
+       if(g[u][v]){
+          if(!flag){
+             buildT(cur->lchild, v);
+             cur=cur->lchild;
+             flag=true;
+          }
+          else{
+             buildT(cur->rchild, v);
+             cur=cur->rchild;
+          }
+       }
+}
+
+
+void prePrint(Tree *T){
+   if(!T) return ;
+   cout<<T->d<<" ";
+   prePrint(T->lchild);
+   prePrint(T->rchild);
+}
+
+
+int main(){
+   Tree *T=NULL; 
+   while(cin>>n>>m){
+         memset(g, 0, sizeof(g));
+         memset(vis, 0, sizeof(vis));
+      while(m--){
+         int u, v;
+         cin>>u>>v;
+         g[u][v]=1;
+         par[v]=u;
+      }
+      bool flag=false;
+      Tree *cur;
+      for(int i=1; i<=n; ++i)
+          if(!vis[i]){ 
+             if(!flag){
+                flag=true;
+                buildT(T, i); 
+                cur=T; 
+             }
+             else if(!par[i]){//也就是找入度为0的节点！ 
+                buildT(cur->rchild, i);
+                cur=cur->rchild;
+             }
+          }
+      prePrint(T);
+   }
+   return 0;
+}
+
+/*
+11 8
+2 1
+2 3
+2 4
+5 6
+6 9
+5 7
+5 8
+11 10
+
+*/

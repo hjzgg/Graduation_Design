@@ -1,0 +1,141 @@
+class Node{
+	public String x;
+	public List<Edge> edges = new ArrayList<Edge>();
+	public Node(String x){
+		this.x = x;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((edges == null) ? 0 : edges.hashCode());
+		result = prime * result + ((x == null) ? 0 : x.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (x == null) {
+			if (other.x != null)
+				return false;
+		} else if (!x.equals(other.x))
+			return false;
+		return true;
+	}
+	
+}
+
+//两个节点的组合
+class TwoNode implements Comparable<TwoNode>{
+	private String newContent;
+	public TwoNode(Node from, Node to) {
+		super();
+		newContent = from.x + to.x;
+	}
+	@Override
+	public int compareTo(TwoNode o) {
+		return this.newContent.compareTo(o.newContent);
+	}
+}
+
+class Edge{
+	public Node to;
+	public Node from;
+	public int dist;
+	public Edge(Node from, Node to, int dist) {
+		super();
+		this.to = to;
+		this.from = from;
+		this.dist = dist;
+	}
+	
+	@Override
+	public String toString(){
+		return from.x + " " + to.x + " " + dist;
+	}
+}
+
+
+public class Main {
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String data = scan.nextLine();
+		 String[] edges = data.split(";");
+		 //默认有权值, 无向图
+		 List<Node> nodes = buildG(edges);
+		 floyd(nodes);
+	}
+	
+	private static Map<TwoNode, Integer> dist = new TreeMap<TwoNode, Integer>();
+	
+	private static void floyd(List<Node> nodes){
+		for(Node node : nodes){
+			dist.put(new TwoNode(node, node), 0);
+			for(Edge edge : node.edges){
+				dist.put(new TwoNode(edge.from, edge.to), edge.dist);
+				dist.put(new TwoNode(edge.to, edge.from), edge.dist);
+			}
+		}
+		
+		for(int k=0; k<nodes.size(); ++k){
+			for(int i=0; i<nodes.size(); ++i){
+				if(k != i) {
+					for(int j=0; j<nodes.size(); ++j) {
+						if(j != k && j != i) {
+							TwoNode ij = new TwoNode(nodes.get(i), nodes.get(j));
+							TwoNode ik = new TwoNode(nodes.get(i), nodes.get(k));
+							TwoNode kj = new TwoNode(nodes.get(k), nodes.get(j));
+							
+							int dij = 0, dik = 0, dkj = 0;
+							if(dist.get(ij) == null) dij = Integer.MAX_VALUE/2;
+							else dij = dist.get(ij);
+							if(dist.get(ik) == null) dik = Integer.MAX_VALUE/2;
+							else dik = dist.get(ik);
+							if(dist.get(kj) == null) dkj = Integer.MAX_VALUE/2;
+							else dkj = dist.get(kj);
+							
+							if(dij > dik + dkj){
+								dist.put(ij, dik + dkj);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		//打印任意两点的最短距离
+		for(int i=0; i<nodes.size(); ++i){
+			for(int j=i+1; j<nodes.size(); ++j){
+				System.out.println(nodes.get(i).x + "---" + nodes.get(j).x + " " + dist.get(new TwoNode(nodes.get(i), nodes.get(j))));
+			}
+		}
+	}
+	
+	private static List<Node> buildG(String[] edges) {
+		Map<String, Node> map = new HashMap<String, Node>();
+		for(String edge : edges){
+			 String[] msgs = edge.split(" ");
+			 if(map.get(msgs[0]) == null)
+				 map.put(msgs[0], new Node(msgs[0]));
+			 if(map.get(msgs[1]) == null) 
+				 map.put(msgs[1], new Node(msgs[1]));
+			 Node from = map.get(msgs[0]);
+			 Node to = map.get(msgs[1]);
+			 Edge fromTo = new Edge(from, to, Integer.valueOf(msgs[2]));
+			 Edge toFrom = new Edge(to, from, Integer.valueOf(msgs[2]));
+			 from.edges.add(fromTo);
+			 to.edges.add(toFrom);
+		}
+		List<Node> nodes = new ArrayList<Node>();
+		for(String key : map.keySet())
+			nodes.add(map.get(key));
+		return nodes;
+	}
+}

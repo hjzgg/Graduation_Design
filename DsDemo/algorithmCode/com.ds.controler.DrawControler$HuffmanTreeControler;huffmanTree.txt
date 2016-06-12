@@ -1,0 +1,213 @@
+http://www.cnblogs.com/hujunzheng/p/4656326.html
+//编码
+#include<iostream> 
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
+#include<algorithm>
+#include<queue>
+#include<fstream>
+#include<map> 
+using namespace std;
+
+typedef struct HuffmanNode{
+    int w;//节点的权值 
+    int ld, rd;//左右孩子节点 
+    int p;//父节点 
+    char ch;//当前节点的字符
+    HuffmanNode(){
+        ld = rd = p = -1;
+    }
+}huffmanNode, *pHuffmanNode;
+
+typedef pair<int, int> pii;//haffuman节点和它的编号 
+
+bool operator > (pii x, pii y){
+    return x.first > y.first;
+}
+
+struct Huffman{
+    int cntNode;//总结点的个数 
+    string orgCode;
+    string huffmanCode;
+    pHuffmanNode huffman =    NULL;
+    priority_queue<pii, vector<pii>, greater<pii> >qNode;
+    map<string, char> huffmanMapx;//哈夫曼编码对应字符 
+    map<char, string> huffmanMapy;//字符对应哈夫曼编码 
+    void initHuffman(char *str){
+        orgCode = str;
+        cntNode = 0;
+        int cnt[150];//统计每一个节点的个数 
+        memset(cnt, 0, sizeof(cnt));
+        for(int i=0; str[i]; ++i){
+            if(cnt[str[i]]==0) ++cntNode;
+            ++cnt[str[i]];
+        }
+        huffman = new HuffmanNode[2*(cntNode)];
+        int index = 0;
+        for(int i=0; i<150; ++i){
+            if(cnt[i]!=0){
+                huffman[index].w = cnt[i];
+                huffman[index].ch = i;
+                qNode.push(make_pair(huffman[index].w, index));
+                ++index;
+            }
+        }
+        while(qNode.size()>=2) {
+            pii ldPii = qNode.top();
+            qNode.pop();
+            pii rdPii = qNode.top();
+            qNode.pop();
+            huffman[index].w = ldPii.first + rdPii.first;
+            huffman[index].ld = ldPii.second;
+            huffman[index].rd = rdPii.second;
+            huffman[ldPii.second].p = index;
+            huffman[rdPii.second].p = index;
+            qNode.push(make_pair(huffman[index].w, index));
+            ++index; 
+        }
+    }
+    
+    void huffmanCoding() {
+        for(int i=0; i<cntNode; ++i){//从每一个孩子节点向上寻找 
+            string code = "";
+            for(int child=i, p=huffman[child].p; ~p; child = p, p = huffman[child].p) {
+                if(huffman[p].ld == child){//左子树 
+                    code += '0';
+                } else if(huffman[p].rd == child){//右子树
+                     code += '1';
+                } 
+            }
+            reverse(code.begin(), code.end());
+            huffmanMapx.insert(make_pair(code, huffman[i].ch));
+            huffmanMapy.insert(make_pair(huffman[i].ch, code));
+        }
+    }
+    
+    void outHuffmanTree(fstream &fout, int f){
+        if(huffman[f].ld==-1 && huffman[f].rd==-1){
+            fout<<0<<" ";
+            return ;
+        } else {
+            fout<<1<<" ";
+            outHuffmanTree(fout, huffman[f].ld);
+            outHuffmanTree(fout, huffman[f].rd);
+        }
+    }
+    
+    void outHuffmanCode(){
+        huffmanCode = "";//存储字符串的哈夫曼编码之后的内容 
+        fstream fout("out.txt", ios_base::out);
+        for(int i=0; i<orgCode.length(); ++i){
+            huffmanCode += huffmanMapy[orgCode[i]];
+        }
+        cout<<huffmanCode<<endl;
+        fout<<huffmanCode<<endl;//想文件中输入huffman编码
+        int f = 2*cntNode-2;//huffman树的父节点
+        outHuffmanTree(fout, f);
+        fout<<endl;
+        for(map<string, char>::iterator it = huffmanMapx.begin(); it!=huffmanMapx.end(); ++it){
+            cout<<it->first << " -> " << it->second<<endl; 
+            fout<<it->first<<" "<<it->second<<endl; //向文件中输入HuffmanMap 
+        }
+    }
+};
+
+int main(){
+    char str[100];
+    Huffman huffman;
+    gets(str);
+    huffman.initHuffman(str);
+    huffman.huffmanCoding();
+    huffman.outHuffmanCode();
+    return 0;
+}
+
+//译码
+#include<iostream> 
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
+#include<algorithm>
+#include<queue>
+#include<fstream>
+#include<map> 
+using namespace std;
+
+typedef struct HuffmanTreeNode{
+    HuffmanTreeNode *ld, *rd;
+    HuffmanTreeNode(){
+        ld = NULL;
+        rd = NULL;
+    }
+} *pHuffmanTreeNode;
+
+
+struct Huffman{
+    pHuffmanTreeNode T;
+    string code;
+    map<string, char>huffmanMapx;
+    
+    void buildT(fstream &fin, pHuffmanTreeNode &T){
+        int w;
+        fin>>w;
+        T = new HuffmanTreeNode(); 
+        if(w==0)
+            return ;
+         buildT(fin, T->ld);
+         buildT(fin, T->rd);
+    }
+    
+    void outT(pHuffmanTreeNode T){
+        if(T->ld != NULL){
+            cout<<0<<endl;
+            outT(T->ld); 
+        }
+        else return;
+        if(T->rd != NULL){
+            cout<<1<<endl;
+            outT(T->rd); 
+        }
+    }
+    
+    void initHuffmanTree(){
+        fstream fin("in.txt", ios_base::in);
+        T = NULL;
+        fin>>code;
+        buildT(fin, T);
+        //outT(T);
+        string mapContent;
+        while(getline(fin, mapContent)){
+            int index = mapContent.find_first_of(' ');
+            huffmanMapx.insert(make_pair(mapContent.substr(0, index), mapContent[index+1]));
+        }
+    }
+    
+    void outHuffmanEncode(){
+        string encode = "", cd="";
+        initHuffmanTree();
+        pHuffmanTreeNode p = T;
+        for(int i=0; i<code.length(); ++i){
+            if(p->ld==NULL && p->rd==NULL){
+                encode+=huffmanMapx[cd];
+                cd="";
+                --i;
+                p=T;
+            } else {
+                cd+=code[i];
+                if(code[i]=='0')
+                    p=p->ld;
+                else if(code[i]=='1')
+                    p=p->rd;
+            }
+            if(i==code.length()-1) encode+=huffmanMapx[cd];
+        }
+        cout<<encode<<endl;
+    }
+};
+
+int main(){
+    Huffman huffman;
+    huffman.outHuffmanEncode();
+    return 0;
+}

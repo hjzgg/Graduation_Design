@@ -1,0 +1,47 @@
+#include<iostream>
+#include<cstring>
+#include<string>
+#include<queue>
+#include<map>
+#include<cstdlib> 
+#include<cstdio>
+const int INF=0X3f3f3f3f;
+using namespace std;
+
+typedef struct
+{
+   int a[100];
+   int len;
+   void outList(){
+           for(int i=1; i<=len; ++i)
+               cout<<a[i]<<" ";
+           cout<<endl;
+   }
+}list;
+list L;
+
+void bubble_sort()
+{
+   int i, j, change=1;
+   for(j=L.len; change && j>=1; j--)
+     {
+         change=0;
+         for(i=1; i<j; i++)
+           if(L.a[i]>L.a[i+1])
+             {
+                L.a[i]^=L.a[i+1];
+               L.a[i+1]^=L.a[i];
+                 L.a[i]^=L.a[i+1];
+                 change=1;
+             }
+     }
+}
+
+int main() {
+    int i;
+   scanf("%d", &L.len);
+   for(i=1; i<=L.len; i++)
+     scanf("%d", &L.a[i]);
+    bubble_sort(); 
+    return 0;
+}

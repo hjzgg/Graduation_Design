@@ -1,0 +1,65 @@
+class Node{
+	public String x;
+	public List<Edge> edges = new ArrayList<Edge>();
+	public Node(String x){
+		this.x = x;
+	}
+}
+
+class Edge{
+	public Node to;
+	public Node from;
+	public int dist;
+	public Edge(Node from, Node to, int dist) {
+		super();
+		this.to = to;
+		this.from = from;
+		this.dist = dist;
+	}
+	
+	@Override
+	public String toString(){
+		return from.x + " " + to.x + " " + dist;
+	}
+}
+
+public class Main {
+	
+	public static void main(String[] args){
+		 Scanner scan = new Scanner(System.in);
+		 String data = scan.nextLine();
+		 String[] edges = data.split(";");
+		 //默认有权值, 无向图
+		 List<Node> nodes = buildG(edges);
+		 outG(nodes);
+	}
+	
+	private static void outG(List<Node> nodes) {
+		for(Node node : nodes){
+			System.out.println(node.x);
+			for(Edge edge : node.edges)
+				System.out.println(edge);
+		}
+	}
+
+	private static List<Node> buildG(String[] edges) {
+		Map<String, Node> map = new HashMap<String, Node>();
+		for(String edge : edges){
+			 String[] msgs = edge.split(" ");
+			 if(map.get(msgs[0]) == null)
+				 map.put(msgs[0], new Node(msgs[0]));
+			 if(map.get(msgs[1]) == null) 
+				 map.put(msgs[1], new Node(msgs[1]));
+			 Node from = map.get(msgs[0]);
+			 Node to = map.get(msgs[1]);
+			 Edge fromTo = new Edge(from, to, Integer.valueOf(msgs[2]));
+			 Edge toFrom = new Edge(to, from, Integer.valueOf(msgs[2]));
+			 from.edges.add(fromTo);
+			 to.edges.add(toFrom);
+		}
+		List<Node> nodes = new ArrayList<Node>();
+		for(String key : map.keySet())
+			nodes.add(map.get(key));
+		return nodes;
+	}
+}

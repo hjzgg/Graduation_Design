@@ -1,0 +1,36 @@
+private SegmentTreeNode buildSegmentTree(String[] datas, int ld, int rd, int level){
+	if(ld > rd) return null;
+	if(ld == rd){
+		SegmentTreeNode node = new SegmentTreeNode(datas[ld], ld, rd);
+		DsSegTreeRect shape = new DsSegTreeRect(leftMargin, (level-1)*(ShapeSize.SegmentTreeModel.NODE_HEIGHT+ShapeSize.SegmentTreeModel.LEVEL_DIST)+ShapeSize.SegmentTreeModel.TOP_MARGIN, ShapeSize.SegmentTreeModel.NODE_WIDTH, ShapeSize.SegmentTreeModel.NODE_HEIGHT, node.content, "["+String.valueOf(node.ld) + "," + String.valueOf(node.rd) + "]");
+		leftMargin += ShapeSize.SegmentTreeModel.NODES_HOR_DIST+ShapeSize.SegmentTreeModel.NODE_WIDTH;
+		shapeList.add(shape);
+		node.shape = shape;
+		return node;
+	} else {
+		int mid = (ld+rd)>>1;
+		SegmentTreeNode node = new SegmentTreeNode(null, ld, rd);
+		node.lchild = buildSegmentTree(datas, ld, mid, level+1);
+		
+		DsSegTreeRect shape = new DsSegTreeRect(leftMargin, (level-1)*(ShapeSize.SegmentTreeModel.NODE_HEIGHT+ShapeSize.SegmentTreeModel.LEVEL_DIST)+ShapeSize.SegmentTreeModel.TOP_MARGIN, ShapeSize.SegmentTreeModel.NODE_WIDTH, ShapeSize.SegmentTreeModel.NODE_HEIGHT, null, "["+String.valueOf(node.ld) + "," + String.valueOf(node.rd) + "]");
+		leftMargin += ShapeSize.SegmentTreeModel.NODES_HOR_DIST+ShapeSize.SegmentTreeModel.NODE_WIDTH;
+		
+		node.rchild = buildSegmentTree(datas, mid+1, rd, level+1);
+		int x;
+		if(maxOrMin)
+			x = Math.max(Integer.valueOf(node.lchild.content), Integer.valueOf(node.rchild.content));
+		else 
+			x = Math.min(Integer.valueOf(node.lchild.content), Integer.valueOf(node.rchild.content));
+		node.content = String.valueOf(x);
+		shape.contentLeft = node.content;
+		node.shape = shape;
+		shapeList.add(shape);
+		
+		//ÃÌº”¡¨œﬂ
+		DsLine lineLeft = new DsLine(node.shape.lx+node.shape.lw/2, node.shape.ly+node.shape.lh, node.lchild.shape.lx+node.lchild.shape.lw/2, node.lchild.shape.ly, false);
+		DsLine lineRight = new DsLine(node.shape.lx+node.shape.lw/2, node.shape.ly+node.shape.lh, node.rchild.shape.lx+node.rchild.shape.lw/2, node.rchild.shape.ly, false);
+		shapeList.add(lineLeft);
+		shapeList.add(lineRight);
+		return node;
+	}
+}

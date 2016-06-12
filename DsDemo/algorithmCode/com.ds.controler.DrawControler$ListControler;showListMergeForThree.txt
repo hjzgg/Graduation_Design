@@ -1,0 +1,49 @@
+class List{
+	public int x;
+	public List next;
+	
+	public List(int x){
+		this.x = x;
+		next = null;
+	}
+}
+
+public class Main {
+	public static void main(String[] args){
+		Scanner scan = new Scanner(System.in);
+		int n1 = scan.nextInt();
+		int n2 = scan.nextInt();
+		List head1 = new List(0), pre1 = head1;
+		List head2 = new List(0), pre2 = head2;
+		for(int i = 0; i < n1; ++i){
+			List cur = new List(scan.nextInt());
+			pre1.next = cur;
+			pre1 = cur;
+		}
+		for(int i = 0; i < n2; ++i){
+			List cur = new List(scan.nextInt());
+			pre2.next = cur;
+			pre2 = cur;
+		}
+		
+		List head3 = new List(0), pre3 = head3;
+		for(pre1 = head1.next, pre2 = head2.next; pre1 != null && pre2 != null; pre3 = pre3.next){
+			if(pre1.x < pre2.x) {
+				pre3.next = new List(pre1.x);
+				pre1 = pre1.next;
+			} else {  
+				pre3.next = new List(pre2.x);
+				pre2 = pre2.next;
+			}
+		}
+		
+		if(pre1 != null) pre3.next = pre1;
+		if(pre2 != null) pre3.next = pre2;
+		
+		for(pre3 = head3.next; pre3 != null; pre3 = pre3.next){
+			if(pre3 != head3.next)
+				System.out.print(" ");
+			System.out.print(pre3.x);
+		}
+	}
+}

@@ -1,0 +1,109 @@
+#include<iostream> 
+#include<cstring>
+#include<cstdio>
+#include<cstdlib> 
+#define MAX_VERTEX_NUM 20    
+using namespace std;
+typedef struct ArcBox{
+    int tailVex, headVex;//该弧的尾和头顶点的位置 
+    struct ArcBox *hlink, *tlink;//分别为弧头相同和弧尾相同的弧的链域 
+    ArcBox(){
+        hlink = NULL;
+        tlink = NULL;
+    }
+} ArcBox; 
+
+typedef struct VexNode{
+    int data;
+    ArcBox *firstin, *firstout;
+    VexNode(){
+        firstin = NULL;
+        firstout = NULL;
+    } 
+} VexNode; 
+
+typedef struct{
+    VexNode xlist[MAX_VERTEX_NUM];
+    int vexnum, arcnum;
+} OLGraph;
+
+void buildG(OLGraph &g, int u, int v){
+    ArcBox *p = new ArcBox;
+    /*
+        或者， new 方式可以调用类的构造函数 
+        ArcBox *p = (ArcBox *)malloc(sizeof(ArcBox));
+        p->hlink = NULL;
+        p->tlink = NULL;    
+    */ 
+    p->tailVex = u;
+    p->headVex = v;
+    if(g.xlist[u].firstout == NULL){//在弧尾的地方插入 
+        g.xlist[u].firstout = p;
+    } else {
+        ArcBox *tmp = g.xlist[u].firstout;
+        while(tmp->tlink) tmp = tmp->tlink;//找到和u节点相关的最后一个弧尾 
+        tmp->tlink = p; 
+    }
+    
+    if(g.xlist[v].firstin == NULL){//在弧头的地方插入 
+        g.xlist[v].firstin = p;
+    } else {
+        ArcBox *tmp = g.xlist[v].firstin;
+        while(tmp->hlink) tmp = tmp->hlink;//找到和u节点相关的最后一个弧头 
+        tmp->hlink = p; 
+    }
+}
+
+void inG(OLGraph g){
+    printf("从每一个节点出度方向遍历弧\n");
+    for(int i=1; i<=g.vexnum; ++i){
+        ArcBox *tmp = g.xlist[i].firstout;//找到弧尾节点为i的第一个节点
+        printf("节点 %d:\n");
+        while(tmp) {
+            printf("弧 %d %d\n", tmp->tailVex, tmp->headVex);
+            tmp = tmp->tlink;
+        }
+    }
+}
+
+void outG(OLGraph g){
+    printf("每一个节点的入度方向遍历弧\n");
+    for(int i=1; i<=g.vexnum; ++i){
+        ArcBox *tmp = g.xlist[i].firstin;//找到弧头节点为i的第一个节点
+        printf("节点 %d:\n");
+        while(tmp) {
+            printf("弧 %d %d\n", tmp->tailVex, tmp->headVex);
+            tmp = tmp->hlink;
+        }
+    }
+}
+
+int main(){
+    printf("请输入图的节点的个数和图的弧数:\n");
+    OLGraph g;
+    scanf("%d %d", &g.vexnum, &g.arcnum);
+    printf("请输入图的弧:\n");
+    for(int i=0; i<g.arcnum; ++i) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        buildG(g, u, v);
+    }
+    //遍历方式，1.从每一个节点出度方向遍历弧 2.从每一个节点的入度方向遍历弧 
+    inG(g);
+    printf("*****************\n");
+    outG(g);
+    return 0;
+}
+
+/*
+有向图测试数据：
+7
+2
+2
+1
+3
+1
+4
+3 
+
+*/
