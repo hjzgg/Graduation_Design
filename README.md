@@ -1,6 +1,31 @@
 # Graduation_Design
 毕业设计
 
+项目运行结果预览
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p0.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p1.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p2.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p3.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p4.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p5.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p6.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p7.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p8.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p9.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p10.png)
+
+![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/p11.png)
+
 1.项目的最终目录结构应该如下：
 
 ![image](https://github.com/hjzgg/Graduation_Design/blob/master/images/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png)
